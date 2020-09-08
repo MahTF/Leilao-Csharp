@@ -99,5 +99,18 @@ namespace Alura.LeilaoOnline.Tests
             Assert.Equal(valorEsperado, valorObtido);
             Assert.Equal(jose, leilao.Ganhador.Cliente);
         }
+
+        [Fact]
+        public void LeilaoSemLances()
+        {
+            var leilao = new Leilao("Van Gogh");
+
+
+            leilao.TerminaPregao();
+
+            var valorEsperado = 0;
+
+            Assert.Equal(valorEsperado, leilao.Ganhador.Valor);
+        }
     }
 }
