@@ -23,7 +23,7 @@ namespace Alura.LeilaoOnline.Tests
             for (int i = 0; i < ofertas.Length; i++)
             {
                 var valor = ofertas[i];
-                if((i%2) == 0)
+                if ((i % 2) == 0)
                 {
                     leilao.RecebeLance(joao, valor);
                 }
@@ -47,11 +47,23 @@ namespace Alura.LeilaoOnline.Tests
         {
             var leilao = new Leilao("Van Gogh");
 
+            leilao.IniciaPregao();
             leilao.TerminaPregao();
 
             var valorEsperado = 0;
 
             Assert.Equal(valorEsperado, leilao.Ganhador.Valor);
+        }
+
+        [Fact]
+        public void LancaInvalidExDadoPregaoNaoIniciado()
+        {
+            var leilao = new Leilao("Van Gogh");
+
+            //Ao usar o metodo Throws, precisa passar o parametro como Delegate.
+            var exObtida = Assert.Throws<InvalidOperationException>(() => leilao.TerminaPregao());
+            var msgEsperada = "Não é possível finalizar um leilão que não foi iniciado!";
+            Assert.Equal(msgEsperada, exObtida.Message);
         }
     }
 }
