@@ -15,7 +15,8 @@ namespace Alura.LeilaoOnline.Tests
         public void RetornaMaiorValorLances(double valorEsperado, double[] ofertas)
         {
             //Arrange - cenário (Primeiro A)
-            var leilao = new Leilao("Van Gogh");
+            IModalidadeAvaliacao modalidade = new MaiorValor();
+            var leilao = new Leilao("Van Gogh", modalidade);
             var joao = new Interessada("João", leilao);
             var maria = new Interessada("Maria", leilao);
             leilao.IniciaPregao();
@@ -45,7 +46,8 @@ namespace Alura.LeilaoOnline.Tests
         [Fact]
         public void RetornaZeroNoLeilaoSemLances()
         {
-            var leilao = new Leilao("Van Gogh");
+            var modalidade = new MaiorValor();
+            var leilao = new Leilao("Van Gogh", modalidade);
 
             leilao.IniciaPregao();
             leilao.TerminaPregao();
@@ -58,12 +60,41 @@ namespace Alura.LeilaoOnline.Tests
         [Fact]
         public void LancaInvalidExDadoPregaoNaoIniciado()
         {
-            var leilao = new Leilao("Van Gogh");
+            var modalidade = new MaiorValor();
+            var leilao = new Leilao("Van Gogh", modalidade);
 
             //Ao usar o metodo Throws, precisa passar o parametro como Delegate.
             var exObtida = Assert.Throws<InvalidOperationException>(() => leilao.TerminaPregao());
             var msgEsperada = "Não é possível finalizar um leilão que não foi iniciado!";
             Assert.Equal(msgEsperada, exObtida.Message);
+        }
+
+        [Theory]
+        [InlineData(1200, 1250, new double[] { 800, 1150, 1400, 1250 })]
+        public void RetornaValorSuperiorMaisProximoDadoLeilaoNaModalidade(double valorDestino, double valorEsperado, double[] ofertas)
+        {
+            IModalidadeAvaliacao modalidade = new OfertaSuperiorMaisProxima(valorDestino);
+            var leilao = new Leilao("Van Gogh", modalidade);
+            var joao = new Interessada("João", leilao);
+            var maria = new Interessada("Maria", leilao);
+            leilao.IniciaPregao();
+
+            for (int i = 0; i < ofertas.Length; i++)
+            {
+                var valor = ofertas[i];
+                if ((i%2) == 0)
+                {
+                    leilao.RecebeLance(joao, valor);
+                }
+                else
+                {
+                    leilao.RecebeLance(maria, valor);
+                }
+            }
+
+            leilao.TerminaPregao();
+
+            Assert.Equal(valorEsperado, leilao.Ganhador.Valor);
         }
     }
 }
